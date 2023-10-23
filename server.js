@@ -1,9 +1,7 @@
-
 let express = require("express");
 let mongoose = require("mongoose");
 let cors = require("cors");
 let bodyParser = require("body-parser");
-const { createError } = require('express');
 require('dotenv').config();
 
 // Express Route
@@ -37,7 +35,7 @@ const server = app.listen(port, () => {
 });
 // 404 Error
 app.use((req, res, next) => {
-  next(createError(404));
+  res.status(404).send("404 Not Found");
 });
 app.use(function (err, req, res, next) {
   console.error(err.message);
