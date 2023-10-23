@@ -4,12 +4,15 @@ let mongoose = require("mongoose");
 let cors = require("cors");
 let bodyParser = require("body-parser");
 const { createError } = require('express');
+require('dotenv').config();
 
 // Express Route
 const productRoute = require("./routes/products");
 // Connecting mongoDB Database
-mongoose
-  .connect("mongodb+srv://haimih292:dzn4trt9i0uFomRq@cluster0.fih2ni5.mongodb.net/?retryWrites=true&w=majority")
+mongoose.connect(process.env.MONGODB_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
   .then((x) => {
     console.log(
       `Connected to Mongo! Database name: "${x.connections[0].name}"`,

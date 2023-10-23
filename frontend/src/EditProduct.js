@@ -43,17 +43,18 @@ function EditProduct() {
           description: res.data.data.description,
           price: res.data.data.price,
           quantity: res.data.data.quantity,
-          available: res.data.available,
+          available: JSON.parse(localStorage.getItem('availability')) || res.data.available,
         });
       });
       
   }, [params.id]);
-  const handleCheckboxChange =  (e) => {
+  const handleCheckboxChange = (e) => {
+    const newAvailability = e.target.checked;
     setUserForm((prev) => ({
       ...prev,
-      available: e.target.checked,
+      available: newAvailability,
     }));
-    localStorage.setItem('availability', e.target.checked);
+    localStorage.setItem('availability', JSON.stringify(newAvailability));
   };
   return (
     <div>
