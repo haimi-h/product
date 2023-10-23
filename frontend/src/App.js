@@ -1,69 +1,44 @@
-import React, { useState, useEffect } from "react";
-import {
-  postProductsAPI,
-  getProductsAPI,
-  patchProductsAPI,
-  deleteProductsAPI,
-} from "./api/products";
+import React from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
+import { Routes, Route, Link } from "react-router-dom";
 import CreateProducts from "./CreateProducts";
+import EditProduct from "./EditProduct";
 import ProductTable from "./ProductTable";
-import { Route, Routes, BrowserRouter } from "react-router-dom";
-
 function App() {
-  const [products, setProducts] = useState([]);
-  useEffect(() => {
-    getProductsAPI().then((products) => setProducts(products));
-  }, []);
-  
-  const addProduct = (product) => {
-    postProductsAPI(product).then((data) => {
-      setProducts([...products, data]);
-    });
-  };
-  
-  const updateProduct = (id, isAvailable) => {
-    patchProductsAPI(id, isAvailable ? false : true).then((data) => {
-      if (data) {
-        getProductsAPI().then((products) => setProducts(products));
-      }
-    });
-    
-    
-  };
-  const deleteProduct = (id) => {
-    deleteProductsAPI(id).then((data) => {
-      if (data.deletedCount === 1) {
-        setProducts(products.filter((product) => product._id !== id));
-      }
-    });
-  };
-  
-
-  
-  
-  
-  
   return (
-    <main role="main" className="container">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<CreateProducts onCreate={addProduct} />} />
-
-          <Route
-            path="/products"
-            element={
-              <ProductTable
-                products={products}
-                onUpdate={updateProduct}
-                onDelete={deleteProduct}
-               
-              
-              />
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </main>
+    <div className="App">
+      <nav className="navbar navbar-expand-lg bg-body-tertiary">
+        <div className="container">
+          <Link to={"/create-product"} className="nav-link">
+            Product Management
+          </Link>
+          <div className="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
+              <li className="nav-item">
+                <Link to={"/create-product"} className="nav-link">
+                  Create Product
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link to={"/product-list"} className="nav-link">
+                  Product List
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <div className="container mt-5">
+        <div className="wrapper">
+          <Routes>
+            <Route exact path="/create-product" element={<CreateProducts />} />
+            <Route exact path="/edit-product/:id" element={<EditProduct />} />
+            <Route exact path="/product-list" element={<ProductTable />} />
+          </Routes>
+        </div>
+      </div>
+    </div>
   );
 }
 export default App;

@@ -1,61 +1,82 @@
-const express = require("express");
-//const Product = require('../models/Product')
-const Product = require("../models/productModel");
-const router = express.Router();
-router.get("/", (req, resp) => {
-  Product.find()
-    .then((data) => {
-      resp.json(data);
+let mongoose = require("mongoose"),
+  express = require("express"),
+  router = express.Router();
+// Product Model
+let productSchema = require("../models/productModel");
+// CREATE product
+router.route("/create-product").post(async (req, res, next) => {
+  await productSchema
+    .create(req.body)
+    .then((result) => {
+      res.json({
+        data: result,
+        message: "Data successfully added!",
+        status: 200,
+      });
     })
-    .catch((e) => {
-      resp.json({ message: e });
+    .catch((err) => {
+      return next(err);
     });
 });
-router.post("/", (req, resp) => {
-  const product = new Product({
-    name: req.body.name,
-    description: req.body.description,
-    price: req.body.price,
-    quantity: req.body.quantity,
-    isAvailable: false,
-  });
-  product
-    .save()
-    .then((data) => {
-      resp.json(data);
+// READ products
+router.route("/").get(async (req, res, next) => {
+  await productSchema
+    .find()
+    .then((result) => {
+      res.json({
+        data: result,
+        message: "All items successfully fetched.",
+        status: 200,
+      });
     })
-    .catch((e) => {
-      resp.json({ message: e });
+    .catch((err) => {
+      return next(err);
     });
 });
-router.patch("/:id", (req, resp) => {
-  Product.updateOne(
-    { _id: req.params.id },
-    {
-      $set: {
-        name: req.body.name,
-        description: req.body.description,
-        price: req.body.price,
-        quantity: req.body.quantity,
-        isAvailable: req.body.isAvailable,
-      },
-      
-    }
-  )
-    .then((data) => {
-      resp.json(data);
+// Get Single product
+router.route("/get-product/:id").get(async (req, res, next) => {
+  await productSchema
+    .findById(req.params.id)
+    .then((result) => {
+      res.json({
+        data: result,
+        message: "Data successfully fetched.",
+        status: 200,
+      });
     })
-    .catch((e) => {
-      resp.json({ message: e });
+    .catch((err) => {
+      return next(err);
     });
 });
-router.delete("/:id", (req, resp) => {
-  Product.deleteOne({ _id: req.params.id })
-    .then((data) => {
-      resp.json(data);
+// Update product
+router.route("/update-product/:id").put(async (req, res, next) => {
+  await productSchema
+    .findByIdAndUpdate(req.params.id, {
+      $set: req.body,
     })
-    .catch((e) => {
-      resp.json({ message: e });
+    .then((result) => {
+      console.log(result);
+      res.json({
+        data: result,
+        msg: "Data successfully updated.",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+// Delete product
+router.route("/delete-products/:id").delete(async (req, res, next) => {
+  await productSchema
+  
+    .findByIdAndRemove(req.params.id)
+    .then(() => {
+      res.json({
+        msg: "Data successfully updated.",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
     });
 });
 module.exports = router;

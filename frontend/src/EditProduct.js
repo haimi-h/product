@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-function CreateProducts() {
+function EditProduct() {
   const [userForm, setUserForm] = useState({
     name: "",
     description: "",
@@ -8,32 +9,56 @@ function CreateProducts() {
     quantity: "",
     available: false
   });
+  let params = useParams();
+  let navigate = useNavigate();
   const inputsHandler = (e) => {
     setUserForm((prevNext) => ({
       ...prevNext,
       [e.target.name]: e.target.value,
     }));
   };
-  const onSubmit = (e) => {
+  const onUpdate = (e) => {
     e.preventDefault();
+
     axios
-      .post("http://localhost:4000/products/create-product", userForm)
+      .put("http://localhost:4000/products/update-product/" + params.id, {
+        name: userForm.name,
+        description: userForm.description,
+        price: userForm.price,
+        quantity: userForm.quantity,
+        available: userForm.available,
+      })
       .then((res) => {
-        console.log(res.data);
-        setUserForm({
-          name: "",
-          description: "",
-          price: "",
-          quantity: "",
-          available: false
-        });
+        console.log({ status: res.status });
+        navigate("/product-list");
+        
       });
   };
-  useEffect(() => {}, []);
+  useEffect(() => {
+    axios
+      .get("http://localhost:4000/products/get-product/" + params.id)
+      .then((res) => {
+        setUserForm({
+          name: res.data.data.name,
+          description: res.data.data.description,
+          price: res.data.data.price,
+          quantity: res.data.data.quantity,
+          available: res.data.available,
+        });
+      });
+      
+  }, [params.id]);
+  const handleCheckboxChange =  (e) => {
+    setUserForm((prev) => ({
+      ...prev,
+      available: e.target.checked,
+    }));
+    localStorage.setItem('availability', e.target.checked);
+  };
   return (
-    <div className="container">
+    <div>
       <div className="form-wrapper">
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onUpdate}>
           <div className="mb-3">
             <label className="form-label">Name</label>
             <input
@@ -79,18 +104,16 @@ function CreateProducts() {
             />
           </div>
           <div className="mb-3">
-            <label className="px-2">Availability</label>
+            <label>Availability</label>
             <input
               type="checkbox"
               checked={userForm.available}
-              onChange={(e) =>
-                setUserForm({ ...userForm, available: e.target.checked })
-              }
+              onChange={handleCheckboxChange}
             />
           </div>
           <div className="mb-3">
             <button type="submit" className="btn btn-primary custom-button">
-              Submit
+              Update
             </button>
           </div>
         </form>
@@ -98,4 +121,4 @@ function CreateProducts() {
     </div>
   );
 }
-export default CreateProducts;
+export default EditProduct;

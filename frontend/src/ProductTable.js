@@ -1,68 +1,67 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-
-function ProductTable(props) {
-  const { products, onUpdate, onDelete} = props;
-  
-
-  
-  
+import axios from "axios";
+function ProductTable() {
+  const [userForm, setUserForm] = useState([]);
+  const deleteProduct = (_id) => {
+    axios
+      .delete("http://localhost:4000/products/delete-products/" + _id)
+      .then(() => {
+        console.log("Data successfully deleted!");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  useEffect(() => {
+    axios
+      .get("http://localhost:4000/products/")
+      .then((res) => {
+        setUserForm(res.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [userForm]);
   return (
-    <div className="App mt-5">
-      <table className="table table-striped">
+    <div>
+      <table className="table">
         <thead>
           <tr>
             <th scope="col">Name</th>
             <th scope="col">Description</th>
             <th scope="col">Price</th>
             <th scope="col">Quantity</th>
-            <th scope="col">Available</th>
-            <th scope="col">Edit</th>
-            <th scope="col">Delete</th>
+
+            <th scope="col">Action</th>
           </tr>
         </thead>
         <tbody>
-        
-          {
-            
-          products.map(product => {
+          {userForm.map((user, index) => {
             return (
-              <tr key={product._id}>
-                <td>{product.name}</td>
-                <td>{product.description}</td>
-                <td>{product.price}</td>
-                <td>{product.quantity}</td>
-                
-
-                <td onClick={() => onUpdate(product._id, product.isAvailable)}>
-                  {product.isAvailable ? (
-                    <input
-                      type="checkbox"
-                      checked
-                      onChange={() => onUpdate(product._id, false)}
-                    />
+              <tr key={index}>
+                <td>{user.name}</td>
+                <td>{user.description}</td>
+                <td>{user.price} Br.</td>
+                <td>{user.quantity}</td>
+                <td>
+                 
+                  {user.available ? (
+                    <span className="text-success">Available</span>
                   ) : (
-                    <input
-                      type="checkbox"
-                      onChange={() => onUpdate(product._id, true)}
-                    />
+                    <span className="text-danger">Not Available</span>
                   )}
                 </td>
                 <td>
-                <Link to={`/products/edit/${product._id}`}>
-
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => onDelete(product._id)}
+                  <Link
+                    className="btn btn-primary btn-sm me-2 custom-button"
+                    to={"/edit-product/" + user._id}
                   >
                     Edit
-                  </button>
                   </Link>
-                </td>
-                <td>
                   <button
-                    className="btn btn-danger"
-                    onClick={() => onDelete(product._id)}
+                    className="btn btn-danger btn-sm custom-delete"
+                    onClick={() => deleteProduct(user._id)}
                   >
                     Delete
                   </button>

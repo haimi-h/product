@@ -1,15 +1,41 @@
-const express = require('express')
-const app = express()
-const cors = require('cors')
-const bodyParser = require('body-parser')
-const productRoute = require('./routes/products')
-const mongoose = require('mongoose')
-app.use(cors())
-app.use(bodyParser.json())
-app.use('/products', productRoute)
-mongoose.connect("mongodb+srv://haimih292:dzn4trt9i0uFomRq@cluster0.fih2ni5.mongodb.net/?retryWrites=true&w=majority").then(data => {
-    console.log("connected to DB")
-}).catch(error => {
-    console.log(error)
-})
-app.listen(3000)
+
+let express = require("express");
+let mongoose = require("mongoose");
+let cors = require("cors");
+let bodyParser = require("body-parser");
+// Express Route
+const productRoute = require("./routes/products");
+// Connecting mongoDB Database
+mongoose
+  .connect("mongodb+srv://haimih292:dzn4trt9i0uFomRq@cluster0.fih2ni5.mongodb.net/?retryWrites=true&w=majority")
+  .then((x) => {
+    console.log(
+      `Connected to Mongo! Database name: "${x.connections[0].name}"`,
+    );
+  })
+  .catch((err) => {
+    console.error("Error connecting to mongo", err.reason);
+  });
+const app = express();
+app.use(bodyParser.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  }),
+);
+app.use(cors());
+app.use("/products", productRoute);
+// PORT
+const port = process.env.PORT || 4000;
+const server = app.listen(port, () => {
+  console.log("Connected to port " + port);
+});
+// 404 Error
+app.use((req, res, next) => {
+  next(createError(404));
+});
+app.use(function (err, req, res, next) {
+  console.error(err.message);
+  if (!err.statusCode) err.statusCode = 500;
+  res.status(err.statusCode).send(err.message);
+});

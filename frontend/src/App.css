@@ -1,0 +1,21 @@
+.wrapper {
+    max-width: 700px;
+    margin: 0 auto;
+   
+  }
+
+body {
+  background-image: url('pic.png');
+  
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-size: 400px auto; /* Adjust the width (50px in this example) to your desired size */
+  background-position: left center;
+  background-attachment: fixed;
+}
+.custom-button{
+  background-color: #6C63FF;
+}
+.custom-delete{
+  background-color: #F50057;
+}
